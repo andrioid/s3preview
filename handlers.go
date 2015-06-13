@@ -10,18 +10,17 @@ import (
 	"io"
 	"net/http"
 	//"net/url"
+	"image/color"
 	"path"
 )
 
 func registerHandlers(r *mux.Router) {
-	r.HandleFunc("/{bucket:[a-z0-9-]+}/{object}", PassthroughHandler)
-	r.HandleFunc("/{bucket:[a-z0-9-]+}/{object}/debug", DebugHandler)
-	r.HandleFunc("/{bucket:[a-z0-9-]+}/{object}/thumbnail", ThumbnailHandler)
-
+	r.HandleFunc("/{object}", PassthroughHandler)
+	r.HandleFunc("/{object}/debug", DebugHandler)
+	r.HandleFunc("/{object}/{previewType}", ThumbnailHandler)
 }
 
 func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
-	bucket := mux.Vars(r)["bucket"]
 	object := mux.Vars(r)["object"]
 
 	k, err := s3gof3r.EnvKeys() // get S3 keys from environment
@@ -32,7 +31,7 @@ func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
 
 	// Open bucket to put file into
 	s3 := s3gof3r.New("", k)
-	b := s3.Bucket(bucket)
+	b := s3.Bucket(configuraton.Asset_Bucket)
 
 	rb, h, err := b.GetReader(object, nil)
 	if err != nil {
@@ -51,21 +50,28 @@ func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(h) // print key header data
-	fmt.Println(rw, "Hello", bucket, object)
+	fmt.Println(rw, "Hello", configuraton.Asset_Bucket, object)
 }
 
 func DebugHandler(rw http.ResponseWriter, r *http.Request) {
-	bucket := mux.Vars(r)["bucket"]
 	object := mux.Vars(r)["object"]
 
 	basepath := "http://localhost:8097"
-	newPath := path.Join(basepath, bucket, object, "thumbnail")
+	newPath := path.Join(basepath, configuraton.Preview_Bucket, object, "thumbnail")
 	fmt.Fprintf(rw, "%s", newPath)
 }
 
 func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
-	bucket := mux.Vars(r)["bucket"]
 	object := mux.Vars(r)["object"]
+	previewType := mux.Vars(r)["previewType"]
+
+	typeOptions, ok := configuraton.Previews[previewType]
+
+	if ok != true {
+		fmt.Fprintf(rw, "previewType not found")
+		return
+
+	}
 
 	k, err := s3gof3r.EnvKeys() // get S3 keys from environment
 	if err != nil {
@@ -74,8 +80,8 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create s3 path for thumbnai
-	s3path := path.Join(preview_prefix, bucket, "thumbnail", object)
-	s3url := "http://andridk-assets.s3.amazonaws.com/" + path.Join(preview_prefix, bucket, "thumbnail", object)
+	s3path := path.Join(configuraton.Preview_Prefix, previewType, object)
+	s3url := "http://andridk-assets.s3.amazonaws.com/" + path.Join(configuraton.Preview_Prefix, previewType, object)
 
 	resp, err := http.Head(s3url)
 	if err != nil {
@@ -95,10 +101,10 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 
 	// Open bucket to put file into
 	s3 := s3gof3r.New("", k)
-	b := s3.Bucket(bucket)
+	b := s3.Bucket(configuraton.Asset_Bucket)
 
-	rb, h, err := b.GetReader(object, nil)
-	fmt.Println(h)
+	rb, _, err := b.GetReader(object, nil)
+
 	if err != nil {
 		fmt.Fprint(rw, err.Error())
 		return
@@ -108,7 +114,7 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 	}
 
-	pb := s3.Bucket(preview_bucket)
+	pb := s3.Bucket(configuraton.Preview_Bucket)
 
 	hdr := make(http.Header)
 
@@ -119,7 +125,15 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dstImg := imaging.Thumbnail(img, 100, 100, imaging.Linear)
+	dstImg := imaging.New(typeOptions.Width, typeOptions.Height, color.NRGBA{255, 0, 0, 255})
+	if typeOptions.Method == "thumbnail" {
+		dstImg = imaging.Thumbnail(img, typeOptions.Width, typeOptions.Height, imaging.Linear)
+	} else if typeOptions.Method == "resize" {
+		dstImg = imaging.Resize(img, typeOptions.Width, typeOptions.Height, imaging.Box)
+	} else {
+		fmt.Fprintf(rw, "Preview method '%s', not implemented.", typeOptions.Method)
+		return
+	}
 
 	err = imaging.Encode(prw, dstImg, imaging.JPEG)
 	if err != nil {
@@ -136,17 +150,4 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-
-	//fmt.Fprintln(rw, "bucket", preview_bucket, "preview bucket path", s3path)
-	//fmt.Fprintln(rw, "preview bucket url", s3url)
-	// Create url for thumbnail
-
-	// Check if the thumbnail exists
-	// Create Thumbnail
-	// Upload Thumbnail
-
-	//imaging.Encode(os., dstImg, imaging.PNG)
-	//imaging.Save(dstImg, "thumbnail.jpg")
-
-	//fmt.Fprintln(rw, "insert thumbnail here")
 }

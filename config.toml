@@ -1,0 +1,14 @@
+[previews.thumbnail]
+width = 0
+height = 100
+method = "thumbnail"
+
+[previews.small]
+width = 0
+height = 100
+method = "resize"
+
+[previews.large]
+width = 500
+height = 500
+method = "thumbnail"
