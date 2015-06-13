@@ -15,13 +15,15 @@ import (
 )
 
 func registerHandlers(r *mux.Router) {
-	r.HandleFunc("/{object}", PassthroughHandler)
+	r.HandleFunc("/{object:[0-9a-z/-_.]+}/{previewType:[a-zA-Z0-9_-]+}", ThumbnailHandler)
+	r.HandleFunc("/{object:[0-9a-z/-_.]+}", PassthroughHandler)
 	r.HandleFunc("/{object}/debug", DebugHandler)
-	r.HandleFunc("/{object}/{previewType}", ThumbnailHandler)
+
 }
 
 func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
 	object := mux.Vars(r)["object"]
+	fmt.Printf("GET /%s\n", object)
 
 	k, err := s3gof3r.EnvKeys() // get S3 keys from environment
 	if err != nil {
