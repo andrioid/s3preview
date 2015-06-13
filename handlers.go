@@ -15,13 +15,15 @@ import (
 )
 
 func registerHandlers(r *mux.Router) {
-	r.HandleFunc("/{object:[0-9a-z/-_.]+}/{previewType:[a-zA-Z0-9_-]+}", ThumbnailHandler)
-	r.HandleFunc("/{object:[0-9a-z/-_.]+}", PassthroughHandler)
+	r.HandleFunc("/passthrough/{object:[0-9a-z/-_.]+}", PassthroughHandler)
+	r.HandleFunc("/{object:[0-9a-z/-_.]+}", ThumbnailHandler)
+	//r.HandleFunc("/{object:[0-9a-z/-_.]+}/{previewType:[a-zA-Z0-9_-]+}", ThumbnailHandler)
 	r.HandleFunc("/{object}/debug", DebugHandler)
 
 }
 
 func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
+	fmt.Println("PassthroughHandler called")
 	object := mux.Vars(r)["object"]
 	fmt.Printf("GET /%s\n", object)
 
@@ -65,14 +67,18 @@ func DebugHandler(rw http.ResponseWriter, r *http.Request) {
 
 func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	object := mux.Vars(r)["object"]
-	previewType := mux.Vars(r)["previewType"]
+	previewType := r.FormValue("t")
+
+	if previewType == "" {
+		fmt.Fprintf(rw, "previewType empty. Add \"/passthrough/\" in front of your URL to see the original")
+		return
+	}
 
 	typeOptions, ok := configuraton.Previews[previewType]
 
 	if ok != true {
-		fmt.Fprintf(rw, "previewType not found")
+		fmt.Fprintf(rw, "previewType (%s) not configured", previewType)
 		return
-
 	}
 
 	k, err := s3gof3r.EnvKeys() // get S3 keys from environment
