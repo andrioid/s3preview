@@ -27,30 +27,36 @@ type Preview struct {
 type Config struct {
 	Previews       map[string]Preview
 	Asset_Bucket   string
+	Asset_Prefix   string
 	Preview_Bucket string
 	Preview_Prefix string
+	StorageDomain  string
+	ListenPort     int
+	ListenPortSSL  int
 }
 
-var configuraton Config
+var configuration Config
 
 func init() {
 }
 
 func main() {
-	if _, err := toml.DecodeFile("config.toml", &configuraton); err != nil {
+	if _, err := toml.DecodeFile("config.toml", &configuration); err != nil {
 		// handle error
 		panic(err)
 	}
-	configuraton.Asset_Bucket = "andridk-assets"
-	configuraton.Preview_Bucket = "andridk-assets"
-	configuraton.Preview_Prefix = "s3preview"
+	configuration.Asset_Bucket = "andridk-assets"
+	configuration.Preview_Bucket = "andridk-assets"
+	configuration.Preview_Prefix = "s3preview"
+	configuration.StorageDomain = "s3.amazonaws.com"
+	configuration.ListenPort = 8097
 
 	r := mux.NewRouter()
 
 	http.Handle("/", r)
 	registerHandlers(r)
-	fmt.Println(configuraton.Previews)
-	//	fmt.Println(configuraton.Previews["small"])
+	//fmt.Println(configuration.Previews)
+	//	fmt.Println(configuration.Previews["small"])
 	fmt.Printf("I'm listening...\n")
-	http.ListenAndServe(":8097", nil)
+	http.ListenAndServe(fmt.Sprintf(":%d", configuration.ListenPort), nil)
 }

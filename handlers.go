@@ -35,7 +35,7 @@ func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
 
 	// Open bucket to put file into
 	s3 := s3gof3r.New("", k)
-	b := s3.Bucket(configuraton.Asset_Bucket)
+	b := s3.Bucket(configuration.Asset_Bucket)
 
 	rb, h, err := b.GetReader(object, nil)
 	if err != nil {
@@ -54,14 +54,14 @@ func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(h) // print key header data
-	fmt.Println(rw, "Hello", configuraton.Asset_Bucket, object)
+	fmt.Println(rw, "Hello", configuration.Asset_Bucket, object)
 }
 
 func DebugHandler(rw http.ResponseWriter, r *http.Request) {
 	object := mux.Vars(r)["object"]
 
 	basepath := "http://localhost:8097"
-	newPath := path.Join(basepath, configuraton.Preview_Bucket, object, "thumbnail")
+	newPath := path.Join(basepath, configuration.Preview_Bucket, object, "thumbnail")
 	fmt.Fprintf(rw, "%s", newPath)
 }
 
@@ -74,7 +74,7 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	typeOptions, ok := configuraton.Previews[previewType]
+	typeOptions, ok := configuration.Previews[previewType]
 
 	if ok != true {
 		fmt.Fprintf(rw, "previewType (%s) not configured", previewType)
@@ -87,9 +87,9 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create s3 path for thumbnai
-	s3path := path.Join(configuraton.Preview_Prefix, previewType, object)
-	s3url := "http://andridk-assets.s3.amazonaws.com/" + path.Join(configuraton.Preview_Prefix, previewType, object)
+	// Create s3 path for thumbnail
+	s3path := path.Join(configuration.Preview_Prefix, previewType, object)
+	s3url := fmt.Sprintf("http://%s.%s/%s", configuration.Preview_Bucket, configuration.StorageDomain, path.Join(configuration.Preview_Prefix, previewType, object))
 
 	resp, err := http.Head(s3url)
 	if err != nil {
@@ -109,9 +109,9 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 
 	// Open bucket to put file into
 	s3 := s3gof3r.New("", k)
-	b := s3.Bucket(configuraton.Asset_Bucket)
+	b := s3.Bucket(configuration.Asset_Bucket)
 
-	rb, _, err := b.GetReader(object, nil)
+	rb, _, err := b.GetReader(path.Join(configuration.Asset_Prefix, object), nil)
 
 	if err != nil {
 		fmt.Fprint(rw, err.Error())
@@ -122,7 +122,7 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 	}
 
-	pb := s3.Bucket(configuraton.Preview_Bucket)
+	pb := s3.Bucket(configuration.Preview_Bucket)
 
 	hdr := make(http.Header)
 
