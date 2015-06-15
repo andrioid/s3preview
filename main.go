@@ -8,8 +8,6 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type PreviewMethod int
-
 type Preview struct {
 	Width  int
 	Height int
@@ -37,11 +35,6 @@ func main() {
 		// handle error
 		panic(err)
 	}
-	configuration.Asset_Bucket = "andridk-assets"
-	configuration.Preview_Bucket = "andridk-assets"
-	configuration.Preview_Prefix = "s3preview"
-	configuration.StorageDomain = "s3.amazonaws.com"
-	configuration.ListenPort = 8097
 
 	r := mux.NewRouter()
 
