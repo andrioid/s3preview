@@ -70,14 +70,15 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	previewType := r.FormValue("t")
 
 	if previewType == "" {
-		fmt.Fprintf(rw, "previewType empty. Add \"/passthrough/\" in front of your URL to see the original")
+		http.Error(rw, "previewType empty. Add \"/passthrough/\" in front of your URL to see the original", 400)
+		//fmt.Fprintf(rw, "previewType empty. Add \"/passthrough/\" in front of your URL to see the original")
 		return
 	}
 
 	typeOptions, ok := configuration.Previews[previewType]
 
 	if ok != true {
-		fmt.Fprintf(rw, "previewType (%s) not configured", previewType)
+		http.Error(rw, "previewType not configured", 400)
 		return
 	}
 

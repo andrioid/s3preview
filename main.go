@@ -8,14 +8,6 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// S3 creds (delete before github push)
-// AKIAIKE57LTDKBK5W6FA
-// 6sFwzVUXFLmzhMewi0jQQXBL0OJsTUmKA3TSTRkz
-
-var asset_bucket = "andridk-assets"
-var preview_bucket = "andridk-assets"
-var preview_prefix = "s3preview"
-
 type PreviewMethod int
 
 type Preview struct {
