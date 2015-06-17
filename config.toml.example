@@ -4,6 +4,10 @@ Preview_Prefix = "s3preview"
 StorageDomain = "s3.amazonaws.com"
 ListenPort = 8097
 
+[previews.sq200]
+width = 200
+height = 200
+method = "thumbnail"
 
 [previews.thumbnail]
 width = 100

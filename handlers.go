@@ -10,13 +10,13 @@ import (
 	"io"
 	"net/http"
 	//"net/url"
-	"image/color"
+	//"image/color"
 	"path"
 )
 
 func registerHandlers(r *mux.Router) {
-	r.HandleFunc("/passthrough/{object:[0-9a-z/-_.]+}", PassthroughHandler)
-	r.HandleFunc("/{object:[0-9a-z/-_.]+}", ThumbnailHandler)
+	//r.HandleFunc("/passthrough/{object:[0-9a-z/_.-]+}", PassthroughHandler)
+	r.HandleFunc("/{object:[0-9A-Za-z/_.-]+}", ThumbnailHandler)
 	//r.HandleFunc("/{object:[0-9a-z/-_.]+}/{previewType:[a-zA-Z0-9_-]+}", ThumbnailHandler)
 	r.HandleFunc("/{object}/debug", DebugHandler)
 
@@ -107,6 +107,8 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch image and generate stuff
+	// - TODO: Check if we're too busy to create the thumbnail now. Return a temporary error 502 if we are.
+	// - TODO: Add the object into preview queue for later processing
 
 	// Open bucket to put file into
 	s3 := s3gof3r.New("", k)
@@ -119,33 +121,24 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img, err := imaging.Decode(rb)
+	dstImg, err := Preview(rb, typeOptions)
+
 	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
 	}
 
+	// Put into Preview Bucket
 	pb := s3.Bucket(configuration.Preview_Bucket)
 
 	hdr := make(http.Header)
+	hdr.Add("Content-Type", "image/jpg")
 
-	hdr.Set("Content-Type", "image/jpg")
 	prw, err := pb.PutWriter(s3path, hdr, nil)
-	if err != nil {
-		fmt.Fprintf(rw, err.Error())
-		return
-	}
 
-	dstImg := imaging.New(typeOptions.Width, typeOptions.Height, color.NRGBA{255, 0, 0, 255})
-	if typeOptions.Method == "thumbnail" {
-		dstImg = imaging.Thumbnail(img, typeOptions.Width, typeOptions.Height, imaging.Linear)
-	} else if typeOptions.Method == "resize" {
-		dstImg = imaging.Resize(img, typeOptions.Width, typeOptions.Height, imaging.Box)
-	} else {
-		fmt.Fprintf(rw, "Preview method '%s', not implemented.", typeOptions.Method)
+	if err = imaging.Encode(prw, dstImg, imaging.JPEG); err != nil {
+		http.Error(rw, err.Error(), 400)
 		return
-	}
-
-	err = imaging.Encode(prw, dstImg, imaging.JPEG)
-	if err != nil {
 	}
 
 	if err = prw.Close(); err != nil {
@@ -153,6 +146,7 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Output to browser
 	err = imaging.Encode(rw, dstImg, imaging.JPEG)
 	if err != nil {
 		fmt.Fprintf(rw, err.Error())

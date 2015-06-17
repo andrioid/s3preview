@@ -8,14 +8,14 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type Preview struct {
+type PreviewOptions struct {
 	Width  int
 	Height int
 	Method string
 }
 
 type Config struct {
-	Previews       map[string]Preview
+	Previews       map[string]PreviewOptions
 	Asset_Bucket   string
 	Asset_Prefix   string
 	Preview_Bucket string
@@ -42,6 +42,6 @@ func main() {
 	registerHandlers(r)
 	//fmt.Println(configuration.Previews)
 	//	fmt.Println(configuration.Previews["small"])
-	fmt.Printf("I'm listening...\n")
+	fmt.Printf("I'm listening (port %d)...\n", configuration.ListenPort)
 	http.ListenAndServe(fmt.Sprintf(":%d", configuration.ListenPort), nil)
 }
