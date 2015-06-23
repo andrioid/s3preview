@@ -1,7 +1,7 @@
 {
   "name": "s3preview",
-  "description": "Preview serving microservice for s3. Creates and uploads thumbnails as needed."
+  "description": "Preview serving microservice for s3. Creates and uploads thumbnails as needed.",
   "repository": "https://github.com/andrioid/s3preview",
   "logo": "https://node-js-sample.herokuapp.com/node.svg",
-  "keywords": ["go", "golang", "s3", "thumbnails", "microservice"]
+  "keywords": ["go", "golang", "s3", "thumbnails", "microservice"],
 }
