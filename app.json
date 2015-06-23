@@ -5,10 +5,13 @@
   "logo": "https://node-js-sample.herokuapp.com/node.svg",
   "keywords": ["go", "golang", "s3", "thumbnails", "microservice"],
   "env": {
-    "AWS_ACCESS_KEY_ID": {
-    	"description": "AWS Access Key ID. Needs to be able to READ, WRITE and LIST buckets"
-    },
-    "AWS_SECRET_ACCESS_KEY": {
-    	"description": "AWS Secret Key"
-    }
+		"AWS_ACCESS_KEY_ID": {
+	    	"description": "AWS Access Key ID. Needs to be able to READ, WRITE and LIST buckets.",
+	    	"value": ""
+	    },
+	    "AWS_SECRET_ACCESS_KEY": {
+	    	"description": "AWS Secret Key",
+	    	"value": ""
+	    }
+	}
 }
