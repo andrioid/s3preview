@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/disintegration/imaging"
 	"image"
-	"io"
 )
 
 // Does Preview Exist? (objectname, type)
@@ -19,17 +18,16 @@ import (
 // - When preview base has to be created from content
 
 // Translates previewTypes to Imaging functions. Returns image interface
-func Preview(r io.Reader, opt PreviewOptions) (img image.Image, err error) {
+func Preview(oimg *image.Image, opt PreviewOptions) (img image.Image, err error) {
 
-	oimg, err := imaging.Decode(r)
 	if err != nil {
 		return img, err
 	}
 
 	if opt.Method == "resize" {
-		img = imaging.Resize(oimg, opt.Width, opt.Height, imaging.Box)
+		img = imaging.Resize(*oimg, opt.Width, opt.Height, imaging.Box)
 	} else {
-		img = imaging.Thumbnail(oimg, opt.Width, opt.Height, imaging.Linear)
+		img = imaging.Thumbnail(*oimg, opt.Width, opt.Height, imaging.Linear)
 	}
 
 	return // img and err are implicit

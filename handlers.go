@@ -8,6 +8,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
+	"log"
 	"net/http"
 	//"net/url"
 	//"image/color"
@@ -92,13 +93,10 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	s3path := path.Join(configuration.Preview_Prefix, previewType, object)
 	s3url := fmt.Sprintf("http://%s.%s/%s", configuration.Preview_Bucket, configuration.StorageDomain, path.Join(configuration.Preview_Prefix, previewType, object))
 
-	resp, err := http.Head(s3url)
-	if err != nil {
-		fmt.Fprintf(rw, err.Error())
-		return
-	}
+	// Ask Mr. Bloom
+	exists := previewBloom.TestString(s3path)
 
-	if resp.StatusCode == 200 {
+	if exists == true {
 		// Thumbnail exists, redirect and return
 		//fmt.Fprintf(rw, "Redirecting to: %s", s3url)
 
@@ -121,7 +119,15 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dstImg, err := Preview(rb, typeOptions)
+	orgImg, err := imaging.Decode(rb)
+	log.Printf("GET %s", path.Join(configuration.Asset_Prefix, object))
+
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+
+	dstImg, err := Preview(&orgImg, typeOptions)
 
 	if err != nil {
 		http.Error(rw, err.Error(), 400)

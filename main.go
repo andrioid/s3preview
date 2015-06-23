@@ -24,6 +24,9 @@ type Config struct {
 	StorageDomain  string
 	ListenPort     int
 	ListenPortSSL  int
+	Seed           bool
+	AWS_Key        string
+	AWS_Secret     string
 }
 
 var configuration Config
@@ -41,16 +44,18 @@ func main() {
 			Email: "andri80@gmail.com",
 		},
 	}
-	app.Usage = "Previews (read thumbnails) for AWS S3"
+	app.Usage = "Previews (or thumbnails) for AWS S3 objects"
+	app.Version = "0.1.0"
+	app.HideVersion = true
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "s3-key",
+			Name:   "aws-key",
 			Usage:  "AWS Access Key. Needs to have S3 Access.",
 			EnvVar: "AWS_ACCESS_KEY_ID",
 		},
 		cli.StringFlag{
-			Name:   "s3-secret-key",
+			Name:   "aws-secret",
 			Usage:  "AWS Secret Key",
 			EnvVar: "AWS_SECRET_ACCESS_KEY",
 		},
@@ -81,14 +86,20 @@ func main() {
 			Value:  "/s3preview",
 			EnvVar: "ASSET_PREFIX",
 		},
+		cli.BoolFlag{
+			Name:   "generate",
+			Usage:  "Will generate missing previews during startup.",
+			EnvVar: "GENERATE",
+		},
 	}
 
 	// TODO: Finish CLI'fying the program
 
 	app.Action = func(c *cli.Context) {
-		if _, err := toml.DecodeFile("config.toml", &configuration); err != nil {
-			// handle error
-			panic(err)
+		Configure(c)
+		PopulatePreviewCache()
+		if c.Bool("generate") == true {
+			GenerateMissing()
 		}
 
 		r := mux.NewRouter()
@@ -102,5 +113,21 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
 
+func Configure(c *cli.Context) {
+	if _, err := toml.DecodeFile("config.toml", &configuration); err != nil {
+		panic(err)
+	}
+	if c.String("aws-key") != "" {
+		configuration.AWS_Key = c.String("aws-key")
+	}
+	if c.String("aws-secret") != "" {
+		configuration.AWS_Secret = c.String("aws-secret")
+	}
+
+	if configuration.AWS_Key == "" || configuration.AWS_Secret == "" {
+		fmt.Println("AWS Configuration Required.")
+		os.Exit(1)
+	}
 }
