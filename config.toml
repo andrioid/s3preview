@@ -1,6 +1,6 @@
 Asset_Bucket = "andridk-assets"
 Preview_Bucket = "andridk-assets"
-Preview_Prefix = "s3preview"
+Preview_Prefix = "s3preview/"
 StorageDomain = "s3.amazonaws.com"
 ListenPort = 8097
 

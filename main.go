@@ -83,7 +83,6 @@ func main() {
 		cli.StringFlag{
 			Name:   "preview-prefix",
 			Usage:  "Prefix for Preview Bucket. E.g. /s3preview",
-			Value:  "/s3preview",
 			EnvVar: "PREVIEW_PREFIX",
 		},
 		cli.BoolFlag{

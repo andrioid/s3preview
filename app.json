@@ -14,16 +14,19 @@
 	    	"value": ""
 	    },
 	    "PREVIEW_BUCKET": {
+	    	"description": "Bucket to store previews.",
+	    	"value": ""
 
 	    },
 	    "PREVIEW_PREFIX": {
-
+	    	"description": "Optional prefix for preview bucket.",
+	    	"value": ""
 	    },
 	    "ASSET_BUCKET": {
-
+	    	"description": "Bucket to fetch assets from."
 	    },
 	    "ASSET_PREFIX": {
-
+	    	"description": "Optional prefix for asset bucket."
 	    }
 	}
 }

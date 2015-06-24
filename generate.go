@@ -143,6 +143,8 @@ func GenerateMissing() {
 			continue
 		}
 
+		fmt.Printf("%s does not have prefix %s\n", elem.Key, configuration.Preview_Prefix)
+
 		var types []string
 
 		for key, _ := range configuration.Previews {
