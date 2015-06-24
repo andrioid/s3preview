@@ -1,0 +1,63 @@
+{
+	"ImportPath": "s3preview",
+	"GoVersion": "go1.4.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.1.0-21-g056c9bc",
+			"Rev": "056c9bc7be7190eaa7715723883caffa5f8fa3e4"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-125-g7ad88c2",
+			"Rev": "7ad88c27405eca0bb4a04bb45897fb7985bd1217"
+		},
+		{
+			"ImportPath": "github.com/disintegration/imaging",
+			"Rev": "3ab6ec550f20d497d2755ed3c48a3e45ad6b7eb9"
+		},
+		{
+			"ImportPath": "github.com/goamz/goamz/aws",
+			"Rev": "50f393d45473b635cab34f2b3e0bbcd103df29dc"
+		},
+		{
+			"ImportPath": "github.com/goamz/goamz/s3",
+			"Rev": "50f393d45473b635cab34f2b3e0bbcd103df29dc"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "47e8f450ef38c857cdd922ec08862ca9d65a1c6d"
+		},
+		{
+			"ImportPath": "github.com/rlmcpherson/s3gof3r",
+			"Comment": "v0.4.10-9-g78d498d",
+			"Rev": "78d498d683a00ec62122b89ea3be6baca228b60e"
+		},
+		{
+			"ImportPath": "github.com/vaughan0/go-ini",
+			"Rev": "a98ad7ee00ec53921f08832bc06ecf7fd600e6a1"
+		},
+		{
+			"ImportPath": "github.com/willf/bitset",
+			"Comment": "v1.0.0-17-g4b22041",
+			"Rev": "4b220417a489359f934045d0509d941a7a2a1038"
+		},
+		{
+			"ImportPath": "github.com/willf/bloom",
+			"Comment": "v1.0.0-38-g270f902",
+			"Rev": "270f902f15edc2c6ae171c30f1de3ce3ae59d30c"
+		},
+		{
+			"ImportPath": "golang.org/x/image/bmp",
+			"Rev": "d8e202c6ce59fad0017414839b6648851d10767e"
+		},
+		{
+			"ImportPath": "golang.org/x/image/tiff",
+			"Rev": "d8e202c6ce59fad0017414839b6648851d10767e"
+		}
+	]
+}
