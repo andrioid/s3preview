@@ -5,6 +5,10 @@
   "logo": "https://node-js-sample.herokuapp.com/node.svg",
   "keywords": ["go", "golang", "s3", "thumbnails", "microservice"],
   "env": {
+  		"BUILDPACK_URL": {
+  			"decription": "Buildpack",
+  			"value": "https://github.com/kr/heroku-buildpack-go"
+  		},
 		"AWS_ACCESS_KEY_ID": {
 	    	"description": "AWS Access Key ID. Needs to be able to READ, WRITE and LIST buckets.",
 	    	"value": ""
