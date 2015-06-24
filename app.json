@@ -12,6 +12,18 @@
 	    "AWS_SECRET_ACCESS_KEY": {
 	    	"description": "AWS Secret Key",
 	    	"value": ""
+	    },
+	    "PREVIEW_BUCKET": {
+
+	    },
+	    "PREVIEW_PREFIX": {
+
+	    },
+	    "ASSET_BUCKET": {
+
+	    },
+	    "ASSET_PREFIX": {
+
 	    }
 	}
 }

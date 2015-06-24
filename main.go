@@ -84,7 +84,7 @@ func main() {
 			Name:   "preview-prefix",
 			Usage:  "Prefix for Preview Bucket. E.g. /s3preview",
 			Value:  "/s3preview",
-			EnvVar: "ASSET_PREFIX",
+			EnvVar: "PREVIEW_PREFIX",
 		},
 		cli.BoolFlag{
 			Name:   "generate",
@@ -125,9 +125,21 @@ func Configure(c *cli.Context) {
 	if c.String("aws-secret") != "" {
 		configuration.AWS_Secret = c.String("aws-secret")
 	}
+	if c.String("preview-bucket") != "" {
+		configuration.Preview_Bucket = c.String("preview-bucket")
+	}
+	if c.String("preview-prefix") != "" {
+		configuration.Preview_Prefix = c.String("preview-prefix")
+	}
+	if c.String("assset-bucket") != "" {
+		configuration.Asset_Bucket = c.String("asset-bucket")
+	}
+	if c.String("asset-prefix") != "" {
+		configuration.Asset_Prefix = c.String("asset-prefix")
+	}
 
-	if configuration.AWS_Key == "" || configuration.AWS_Secret == "" {
-		fmt.Println("AWS Configuration Required.")
+	if configuration.AWS_Key == "" || configuration.AWS_Secret == "" || configuration.Preview_Bucket == "" || configuration.Asset_Bucket == "" {
+		fmt.Println("AWS Configuration Required (key, secret, asset bucket, preview bucket).")
 		os.Exit(1)
 	}
 }
