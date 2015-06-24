@@ -60,10 +60,10 @@ func main() {
 			EnvVar: "AWS_SECRET_ACCESS_KEY",
 		},
 		cli.IntFlag{
-			Name:   "listen-http, l",
+			Name:   "port",
 			Usage:  "HTTP listen port",
 			Value:  80,
-			EnvVar: "HTTP_PORT",
+			EnvVar: "PORT",
 		},
 		cli.StringFlag{
 			Name:   "asset-bucket",
@@ -135,6 +135,10 @@ func Configure(c *cli.Context) {
 	}
 	if c.String("asset-prefix") != "" {
 		configuration.Asset_Prefix = c.String("asset-prefix")
+	}
+
+	if c.Int("port") != 0 {
+		configuration.ListenPort = c.Int("port")
 	}
 
 	if configuration.AWS_Key == "" || configuration.AWS_Secret == "" || configuration.Preview_Bucket == "" || configuration.Asset_Bucket == "" {
