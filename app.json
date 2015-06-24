@@ -20,13 +20,15 @@
 	    },
 	    "PREVIEW_PREFIX": {
 	    	"description": "Optional prefix for preview bucket.",
-	    	"value": ""
+	    	"value": "s3preview/",
+	    	"required": false
 	    },
 	    "ASSET_BUCKET": {
 	    	"description": "Bucket to fetch assets from."
 	    },
 	    "ASSET_PREFIX": {
-	    	"description": "Optional prefix for asset bucket."
+	    	"description": "Optional prefix for asset bucket.",
+	    	"required": false
 	    }
 	}
 }
