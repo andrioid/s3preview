@@ -7,7 +7,6 @@ import (
 	"github.com/rlmcpherson/s3gof3r"
 	_ "image/jpeg"
 	_ "image/png"
-	"io"
 	"log"
 	"net/http"
 	//"net/url"
@@ -19,51 +18,11 @@ func registerHandlers(r *mux.Router) {
 	//r.HandleFunc("/passthrough/{object:[0-9a-z/_.-]+}", PassthroughHandler)
 	r.HandleFunc("/{object:[0-9A-Za-z/_.-]+}", ThumbnailHandler)
 	//r.HandleFunc("/{object:[0-9a-z/-_.]+}/{previewType:[a-zA-Z0-9_-]+}", ThumbnailHandler)
-	r.HandleFunc("/{object}/debug", DebugHandler)
-
+	r.HandleFunc("/", HelloHandler)
 }
 
-func PassthroughHandler(rw http.ResponseWriter, r *http.Request) {
-	fmt.Println("PassthroughHandler called")
-	object := mux.Vars(r)["object"]
-	fmt.Printf("GET /%s\n", object)
-
-	k, err := s3gof3r.EnvKeys() // get S3 keys from environment
-	if err != nil {
-		fmt.Fprint(rw, err.Error())
-		return
-	}
-
-	// Open bucket to put file into
-	s3 := s3gof3r.New("", k)
-	b := s3.Bucket(configuration.Asset_Bucket)
-
-	rb, h, err := b.GetReader(object, nil)
-	if err != nil {
-		fmt.Fprint(rw, err.Error())
-		return
-	}
-	// stream to standard output
-	if _, err = io.Copy(rw, rb); err != nil {
-		fmt.Fprint(rw, err.Error())
-		return
-	}
-	err = rb.Close()
-	if err != nil {
-		fmt.Fprint(rw, err.Error())
-		return
-	}
-
-	fmt.Println(h) // print key header data
-	fmt.Println(rw, "Hello", configuration.Asset_Bucket, object)
-}
-
-func DebugHandler(rw http.ResponseWriter, r *http.Request) {
-	object := mux.Vars(r)["object"]
-
-	basepath := "http://localhost:8097"
-	newPath := path.Join(basepath, configuration.Preview_Bucket, object, "thumbnail")
-	fmt.Fprintf(rw, "%s", newPath)
+func HelloHandler(rw http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(rw, "s3preview - See https://github.com/andrioid/s3preview for more information.")
 }
 
 func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
@@ -71,7 +30,7 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 	previewType := r.FormValue("t")
 
 	if previewType == "" {
-		http.Error(rw, "previewType empty. Add \"/passthrough/\" in front of your URL to see the original", 400)
+		http.Error(rw, "Preview Type empty. E.g. Add ?t=small to your URL", 400)
 		//fmt.Fprintf(rw, "previewType empty. Add \"/passthrough/\" in front of your URL to see the original")
 		return
 	}
@@ -151,6 +110,9 @@ func ThumbnailHandler(rw http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(rw, err.Error())
 		return
 	}
+	log.Printf("PUT %s", s3path)
+
+	previewBloom.AddString(s3path)
 
 	// Output to browser
 	err = imaging.Encode(rw, dstImg, imaging.JPEG)

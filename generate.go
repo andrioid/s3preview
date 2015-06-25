@@ -33,13 +33,13 @@ func PopulatePreviewCache() {
 		return
 	}
 
-	bloomSize := uint(1)
+	bloomSize := 500
 
 	if len(resp.Contents) > 0 {
-		bloomSize = uint(len(resp.Contents))
+		bloomSize = len(resp.Contents) + 500
 	}
 
-	previewBloom = bloom.NewWithEstimates(bloomSize, 0.001)
+	previewBloom = bloom.NewWithEstimates(uint(bloomSize), 0.001)
 
 	for _, elem := range resp.Contents {
 		previewBloom.AddString(elem.Key)

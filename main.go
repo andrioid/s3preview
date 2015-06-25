@@ -130,7 +130,7 @@ func Configure(c *cli.Context) {
 	if c.String("preview-prefix") != "" {
 		configuration.Preview_Prefix = c.String("preview-prefix")
 	}
-	if c.String("assset-bucket") != "" {
+	if c.String("asset-bucket") != "" {
 		configuration.Asset_Bucket = c.String("asset-bucket")
 	}
 	if c.String("asset-prefix") != "" {
@@ -141,8 +141,24 @@ func Configure(c *cli.Context) {
 		configuration.ListenPort = c.Int("port")
 	}
 
-	if configuration.AWS_Key == "" || configuration.AWS_Secret == "" || configuration.Preview_Bucket == "" || configuration.Asset_Bucket == "" {
+	if configuration.AWS_Key == "" || configuration.AWS_Secret == "" {
 		fmt.Println("AWS Configuration Required (key, secret, asset bucket, preview bucket).")
 		os.Exit(1)
+	}
+
+	if configuration.StorageDomain == "" {
+		configuration.StorageDomain = "s3.amazonaws.com"
+	}
+
+	if configuration.Asset_Bucket == "" || configuration.Preview_Bucket == "" {
+		fmt.Println("Asset-Bucket and Preview-Bucket must be configured")
+		os.Exit(1)
+	}
+
+	// Default value for preview_prefix, but only if sharing buckets
+	if configuration.Asset_Bucket == configuration.Preview_Bucket {
+		if configuration.Preview_Prefix == "" {
+			configuration.Preview_Prefix = "s3preview/"
+		}
 	}
 }
