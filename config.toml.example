@@ -1,22 +1,24 @@
-# Squared 200 pixel thumbnail (crop)
+Asset_Bucket = "andridk-assets"
+Preview_Bucket = "andridk-assets"
+Preview_Prefix = "s3preview/"
+StorageDomain = "s3.amazonaws.com"
+ListenPort = 8097
+
 [previews.sq200]
 width = 200
 height = 200
 method = "thumbnail"
 
-# Squared 100 pixel thumbnail
 [previews.thumbnail]
 width = 100
 height = 100
 method = "thumbnail"
 
-# 100 pixel high scaled
 [previews.small]
 width = 0
 height = 100
 method = "resize"
 
-# Squared 500 pixel thumb 
 [previews.large]
 width = 500
 height = 500
